@@ -1,0 +1,71 @@
+HTML
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>صفحة نماذج متعددة</title>
+    <link rel="stylesheet" href="style.css"> 
+</head>
+<body>
+
+    <header>
+        <h1>نماذج التسجيل والبيانات</h1>
+        <nav>
+            <a href="index.html">الرئيسية</a>
+        </nav>
+    </header>
+
+    <main>
+        
+        <section class="login-form">
+            <h2>تسجيل الدخول الحالي</h2>
+            <form action="#" method="POST"> 
+                <div class="input-group">
+                    <label for="username">اسم المستخدم:</label>
+                    <input type="text" id="username" name="username" required>
+                </div>
+                <div class="input-group">
+                    <label for="password">كلمة المرور:</label>
+                    <input type="password" id="password" name="password" required>
+                </div>
+                <button type="submit">دخول</button>
+            </form>
+        </section>
+
+        <hr style="margin: 40px auto; width: 80%; border: 1px solid #ccc;">
+        
+        <section class="login-form"> <h2>نموذج بيانات إضافية</h2>
+            <form action="#" method="POST"> 
+                
+                <div class="input-group">
+                    <label for="full_name">الاسم الكامل:</label>
+                    <input type="text" id="full_name" name="full_name" required>
+                </div>
+
+                <div class="input-group">
+                    <label for="user_age">العمر:</label>
+                    <input type="number" id="user_age" name="user_age" min="18" max="99">
+                </div>
+                
+                <div class="input-group">
+                    <input type="checkbox" id="terms" name="terms_agree"> 
+                    <label for="terms" style="display: inline-block;">أوافق على الشروط والأحكام</label>
+                </div>
+
+                <button type="submit" style="background-color: green;">إرسال البيانات</button>
+                </form>
+        </section>
+        
+    </main>
+
+    <footer>
+        <p>&copy; 2025 جميع الحقوق محفوظة.</p>
+    </footer>
+
+    <script>
+        // أكواد JavaScript الخاصة بك
+    </script>
+
+</body>
+</html>
