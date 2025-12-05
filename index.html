@@ -1,435 +1,246 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-<meta charset="utf-8"/>
-<meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>نظام الإدارة — مدمج</title>
+<meta charset="UTF-8">
+<title>نظام الدخول</title>
+
 <style>
-  :root{
-    --bg1:#e6f2ff; --accent:#0ea5ff; --accent2:#0077cc; --muted:#6b7280; --card:#fff; --danger:#ef4444;
-    --radius:12px;
-  }
-  *{box-sizing:border-box;font-family:"Cairo",sans-serif}
-  html,body{height:100%;margin:0;background:linear-gradient(180deg,var(--bg1),#f3f9ff);color:#0f172a}
-  .wrap{max-width:1100px;margin:28px auto;padding:16px}
-  .card{background:var(--card);border-radius:var(--radius);box-shadow:0 10px 30px rgba(2,6,23,0.06);padding:18px}
-  .appbar{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:16px}
-  .brand{display:flex;align-items:center;gap:12px}
-  .logo{width:56px;height:56px;border-radius:12px;background:linear-gradient(135deg,var(--accent),var(--accent2));display:flex;align-items:center;justify-content:center;color:white;font-weight:800;font-size:20px}
-  h1{margin:0;font-size:20px}
-  .muted{color:var(--muted);font-size:13px}
+    body {
+        margin: 0;
+        background: #071a2d;
+        font-family: "Tahoma";
+        color: #fff;
+        text-align: center;
+    }
 
-  /* Login */
-  #loginBox{max-width:420px;margin:40px auto}
-  .form-row{margin:10px 0}
-  label{display:block;margin-bottom:6px;color:var(--muted);font-size:13px}
-  input[type="text"], input[type="password"], input[type="number"]{
-    width:100%;padding:10px;border-radius:10px;border:1px solid #e6eef9;background:white;font-size:15px
-  }
-  .btn{display:inline-block;padding:10px 14px;border-radius:10px;border:0;cursor:pointer;font-weight:700}
-  .btn-primary{background:linear-gradient(90deg,var(--accent),var(--accent2));color:#fff}
-  .btn-ghost{background:transparent;border:1px solid rgba(15,23,42,0.06);color:var(--muted)}
-  .err{color:var(--danger);margin-top:8px;display:none;text-align:center}
+    .card {
+        width: 90%;
+        max-width: 370px;
+        background: #0d2238;
+        margin: 40px auto;
+        padding: 25px;
+        border-radius: 22px;
+        box-shadow: 0 0 8px #0007;
+    }
 
-  /* Dashboard */
-  .toolbar{display:flex;gap:10px;align-items:center;margin-bottom:12px}
-  .search{flex:1;display:flex;gap:8px}
-  .search input{flex:1;padding:8px;border-radius:10px;border:1px solid #e6eef9}
-  table{width:100%;border-collapse:collapse;background:var(--card);border-radius:10px;overflow:hidden}
-  th,td{padding:12px;border-bottom:1px solid #f1f5f9;text-align:center;font-size:14px}
-  th{background:linear-gradient(90deg,var(--accent),var(--accent2));color:white}
-  td .small{font-size:13px;color:var(--muted)}
-  .action-btn{padding:6px 8px;border-radius:8px;border:0;cursor:pointer}
-  .edit{background:#fbbf24}
-  .del{background:#fecaca;color:#88111b}
-  .logout{background:var(--danger);color:white;padding:8px 12px;border-radius:10px;border:0}
+    .logo {
+        width: 110px;
+        height: 110px;
+        background: linear-gradient(to bottom right, #ff7b00, #ff3d00);
+        margin: auto;
+        border-radius: 25px;
+        font-size: 55px;
+        line-height: 110px;
+    }
 
-  /* modal */
-  .overlay{position:fixed;inset:0;background:rgba(2,6,23,0.45);display:none;align-items:center;justify-content:center;padding:16px}
-  .modal{background:white;padding:16px;border-radius:12px;width:100%;max-width:520px}
-  .row{display:flex;gap:10px}
-  .col{flex:1}
+    input, button {
+        width: 90%;
+        padding: 12px;
+        margin-top: 12px;
+        border-radius: 12px;
+        border: none;
+        font-size: 16px;
+    }
 
-  /* responsive */
-  @media (max-width:720px){
-    .row{flex-direction:column}
-    .logo{width:48px;height:48px}
-  }
+    input {
+        background: #0b1c2e;
+        border: 1px solid #123;
+        color: #fff;
+    }
+
+    button {
+        background: linear-gradient(to right, #ff7b00, #ff3d00);
+        color: white;
+        cursor: pointer;
+    }
+
+    .hidden {
+        display: none;
+    }
+
+    .admin-box, .user-box {
+        text-align: right;
+        margin-top: 15px;
+        padding-right: 20px;
+        font-size: 14px;
+    }
+
+    .list-item {
+        background: #0b1c2e;
+        padding: 10px;
+        border-radius: 10px;
+        margin: 10px 0;
+    }
 </style>
 </head>
+
 <body>
-  <div class="wrap">
-    <div class="card appbar">
-      <div class="brand">
-        <div class="logo" aria-hidden="true">م</div>
-        <div>
-          <h1>نظام الإدارة</h1>
-          <div class="muted">واجهة مدمجة + تخزين محلي</div>
-        </div>
-      </div>
-      <div id="userArea" style="display:none;align-items:center;gap:10px">
-        <div class="muted" id="whoLabel"></div>
-        <button class="btn logout" id="logoutBtn">تسجيل خروج</button>
-      </div>
-    </div>
 
-    <!-- LOGIN -->
-    <div id="loginBox" class="card" aria-live="polite">
-      <h2 style="margin-top:0">تسجيل الدخول</h2>
+<!-- ===== الصفحة الرئيسية ===== -->
+<div id="home" class="card">
+    <div class="logo">م</div>
+    <h2>تسجيل الدخول</h2>
 
-      <div class="form-row">
-        <label for="loginName">اسم المستخدم</label>
-        <!-- لا نضع قيمة افتراضية حتى لا يظهر اسم المشرف -->
-        <input id="loginName" type="text" placeholder="اسم المستخدم" autocomplete="off">
-      </div>
+    <button onclick="showAdminLogin()">تسجيل دخول مشرف</button>
+    <button onclick="showUserLogin()">تسجيل دخول مستخدم</button>
+</div>
 
-      <div class="form-row">
-        <label for="loginPass">كلمة المرور</label>
-        <!-- لا نضع قيمة افتراضية -->
-        <input id="loginPass" type="password" placeholder="كلمة المرور" autocomplete="off">
-      </div>
+<!-- ===== تسجيل دخول المشرف ===== -->
+<div id="adminLogin" class="card hidden">
+    <h2>تسجيل دخول مشرف</h2>
+    <input id="adminUser" placeholder="اسم المشرف">
+    <input id="adminPass" type="password" placeholder="كلمة المرور">
+    <button onclick="loginAdmin()">تسجيل دخول</button>
+    <button onclick="backHome()">رجوع</button>
+</div>
 
-      <div style="display:flex;gap:10px;align-items:center;margin-top:8px">
-        <label style="margin:0;display:flex;align-items:center;gap:8px">
-          <input id="rememberMe" type="checkbox"> تذكرني
-        </label>
-        <div style="flex:1"></div>
-        <button class="btn btn-primary" id="doLogin">دخول</button>
-      </div>
+<!-- ===== تسجيل دخول مستخدم ===== -->
+<div id="userLogin" class="card hidden">
+    <h2>تسجيل دخول مستخدم</h2>
+    <input id="userName" placeholder="اسم المستخدم">
+    <input id="userPass" type="password" placeholder="كلمة المرور">
+    <button onclick="loginUser()">تسجيل دخول</button>
+    <button onclick="backHome()">رجوع</button>
+</div>
 
-      <div class="err" id="loginErr" role="alert"></div>
+<!-- ===== لوحة تحكم المشرف ===== -->
+<div id="adminPanel" class="card hidden">
+    <h2>لوحة تحكم المشرف</h2>
 
-      <p class="muted" style="margin-top:12px">ملاحظة: اسم المشرف وكلمة المرور مخفيان في النظام.</p>
-    </div>
+    <h3>إضافة مستخدم</h3>
+    <input id="addName" placeholder="اسم المستخدم">
+    <input id="addUser" placeholder="يوزر المستخدم">
+    <input id="addPass" placeholder="كلمة المرور">
+    <button onclick="addUserFunc()">إضافة</button>
 
-    <!-- DASHBOARD -->
-    <div id="dashSection" style="display:none">
-      <div class="card">
-        <div class="toolbar">
-          <button class="btn btn-primary" id="openAddBtn">إضافة مستخدم</button>
-          <div class="search">
-            <input id="searchInput" placeholder="بحث باسم المستخدم أو الكود...">
-            <button class="btn btn-ghost" id="clearSearch">مسح</button>
-          </div>
-        </div>
+    <h3>جميع المستخدمين</h3>
+    <div id="usersList"></div>
 
-        <div style="overflow:auto">
-          <table id="usersTable" aria-live="polite">
-            <thead>
-              <tr>
-                <th>اسم المستخدم</th>
-                <th>كلمة المرور</th>
-                <th>مدة الاستخدام (أيام)</th>
-                <th>عدد مرات الاستخدام</th>
-                <th>الكود الرئيسي</th>
-                <th>الكمية (g)</th>
-                <th>تحكم</th>
-              </tr>
-            </thead>
-            <tbody></tbody>
-          </table>
-        </div>
-      </div>
-    </div>
-  </div>
+    <button onclick="logout()">تسجيل الخروج</button>
+</div>
 
-  <!-- Modal (Add / Edit) -->
-  <div class="overlay" id="overlay">
-    <div class="modal card">
-      <h3 id="modalTitle">إضافة مستخدم</h3>
-
-      <div class="form-row">
-        <label>اسم المستخدم</label>
-        <input id="m_name" type="text">
-      </div>
-
-      <div class="form-row">
-        <label>كلمة المرور</label>
-        <input id="m_pass" type="text">
-      </div>
-
-      <div class="row">
-        <div class="col">
-          <label>مدة الاستخدام (أيام)</label>
-          <input id="m_days" type="number" min="0">
-        </div>
-        <div class="col">
-          <label>عدد مرات الاستخدام</label>
-          <input id="m_count" type="number" min="0">
-        </div>
-      </div>
-
-      <div class="form-row">
-        <label>الكود الرئيسي (نصي)</label>
-        <input id="m_master" type="text" placeholder="مثلاً: MASTER-001">
-      </div>
-
-      <div class="form-row">
-        <label>الكمية (g)</label>
-        <input id="m_grams" type="number" min="0">
-      </div>
-
-      <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:12px">
-        <button class="btn btn-primary" id="saveBtn">حفظ</button>
-        <button class="btn btn-ghost" id="cancelBtn">إلغاء</button>
-      </div>
-
-      <div class="err" id="modalErr" style="margin-top:8px;display:none"></div>
-    </div>
-  </div>
+<!-- ===== صفحة المستخدم ===== -->
+<div id="userPage" class="card hidden">
+    <h2>بيانات المستخدم</h2>
+    <div id="userInfo"></div>
+    <button onclick="logout()">تسجيل الخروج</button>
+</div>
 
 <script>
-/* ================= إعداد البيانات الافتراضية ================= */
-// المشرف مخفي داخل السكربت
-const ADMIN_NAME = "محمد";
-const ADMIN_PASS = "1234";
-
-// مفاتيح التخزين
-const USERS_KEY = 'app_users_v1';
-const SESSION_KEY = 'app_session_v1';
-
-// تهيئة المستخدمين الافتراضيين إن لم يوجد
-function ensureDefaults(){
-  try {
-    const raw = localStorage.getItem(USERS_KEY);
-    if(!raw){
-      const def = [
-        { name: ADMIN_NAME, pass: ADMIN_PASS, days: 9999, count: 9999, master: 'MASTER-000', grams: 0, role: 'admin' }
-      ];
-      localStorage.setItem(USERS_KEY, JSON.stringify(def));
-      return def;
-    }
-    return JSON.parse(raw);
-  } catch(e){
-    localStorage.removeItem(USERS_KEY);
-    return ensureDefaults();
-  }
+/* -------------------------------------------
+   إنشاء حساب المشرف الافتراضي داخل LocalStorage
+--------------------------------------------*/
+if (!localStorage.getItem("admins")) {
+    localStorage.setItem("admins", JSON.stringify([{user:"admin", pass:"123"}]));
 }
-let users = ensureDefaults();
-
-/* ================= عناصر الواجهة ================= */
-const loginSection = document.getElementById('loginBox');
-const dashSection = document.getElementById('dashSection');
-const overlay = document.getElementById('overlay');
-const whoLabel = document.getElementById('whoLabel');
-const userArea = document.getElementById('userArea');
-
-const loginName = document.getElementById('loginName');
-const loginPass = document.getElementById('loginPass');
-const rememberMe = document.getElementById('rememberMe');
-const doLogin = document.getElementById('doLogin');
-const loginErr = document.getElementById('loginErr');
-
-const tbody = document.querySelector('#usersTable tbody');
-const openAddBtn = document.getElementById('openAddBtn');
-const searchInput = document.getElementById('searchInput');
-const clearSearch = document.getElementById('clearSearch');
-
-const m_name = document.getElementById('m_name');
-const m_pass = document.getElementById('m_pass');
-const m_days = document.getElementById('m_days');
-const m_count = document.getElementById('m_count');
-const m_master = document.getElementById('m_master');
-const m_grams = document.getElementById('m_grams');
-const modalTitle = document.getElementById('modalTitle');
-const modalErr = document.getElementById('modalErr');
-const saveBtn = document.getElementById('saveBtn');
-const cancelBtn = document.getElementById('cancelBtn');
-
-let editIndex = -1;
-
-/* ================= جلسة ================= */
-function setSession(obj, remember=false){
-  const s = { name: obj.name, role: obj.role || 'user', loginAt: new Date().toISOString() };
-  sessionStorage.setItem(SESSION_KEY, JSON.stringify(s));
-  if(remember) localStorage.setItem(SESSION_KEY, JSON.stringify(s));
-}
-function clearSession(){
-  sessionStorage.removeItem(SESSION_KEY);
-  localStorage.removeItem(SESSION_KEY);
-}
-function getSession(){
-  return JSON.parse(sessionStorage.getItem(SESSION_KEY) || localStorage.getItem(SESSION_KEY) || 'null');
+if (!localStorage.getItem("users")) {
+    localStorage.setItem("users", JSON.stringify([]));
 }
 
-/* ================= تسجيل دخول ================= */
-doLogin.addEventListener('click', () => {
-  loginErr.style.display = 'none';
-  const name = (loginName.value || '').trim();
-  const pass = (loginPass.value || '').trim();
-  if(!name || !pass){ loginErr.textContent = 'الرجاء إدخال اسم المستخدم وكلمة المرور.'; loginErr.style.display='block'; return; }
-
-  // التحقق: لو البيانات تطابق المشرف المخفي
-  if(name === ADMIN_NAME && pass === ADMIN_PASS){
-    setSession({ name: ADMIN_NAME, role: 'admin' }, rememberMe.checked);
-    showDashboard();
-    return;
-  }
-
-  // التحقق عبر قائمة المستخدمين
-  const found = users.find(u => u.name === name && u.pass === pass);
-  if(!found){ loginErr.textContent = 'اسم المستخدم أو كلمة المرور غير صحيحة.'; loginErr.style.display='block'; return; }
-
-  // جلسة للمستخدم العادي
-  setSession(found, rememberMe.checked);
-  showDashboard();
-});
-
-/* إعادة استعادة الجلسة لو كانت موجودة */
-(function tryRestoreSession(){
-  const s = getSession();
-  if(s){
-    showDashboard();
-  } else {
-    showLogin();
-  }
-})();
-
-/* ================= عرض/إخفاء شاشات ================= */
-function showLogin(){
-  loginSection.style.display = 'block';
-  dashSection.style.display = 'none';
-  userArea.style.display = 'none';
-  loginName.value = '';
-  loginPass.value = '';
-  loginErr.style.display = 'none';
+/* ======= إظهار الصفحات ======= */
+function showAdminLogin() {
+    hideAll();
+    document.getElementById("adminLogin").classList.remove("hidden");
 }
 
-function showDashboard(){
-  loginSection.style.display = 'none';
-  dashSection.style.display = 'block';
-  userArea.style.display = 'flex';
-  const s = getSession();
-  whoLabel.textContent = s ? `${s.name} — ${s.role}` : '';
-  renderTable();
+function showUserLogin() {
+    hideAll();
+    document.getElementById("userLogin").classList.remove("hidden");
 }
 
-/* ================= CRUD مستخدمين ================= */
-function saveUsersToStorage(){ localStorage.setItem(USERS_KEY, JSON.stringify(users)); }
-
-function renderTable(filter=''){
-  const q = (filter || '').trim().toLowerCase();
-  tbody.innerHTML = '';
-  users.forEach((u, idx) => {
-    if(q){
-      const hay = (u.name + ' ' + (u.master||'')).toLowerCase();
-      if(!hay.includes(q)) return;
-    }
-    const tr = document.createElement('tr');
-    tr.innerHTML = `
-      <td>${escapeHtml(u.name)}</td>
-      <td>${escapeHtml(u.pass)}</td>
-      <td>${u.days ?? ''}</td>
-      <td>${u.count ?? ''}</td>
-      <td>${escapeHtml(u.master)}</td>
-      <td>${u.grams ?? ''}</td>
-      <td>
-        <button class="action-btn edit" data-i="${idx}">تعديل</button>
-        <button class="action-btn del" data-i="${idx}">حذف</button>
-      </td>
-    `;
-    tbody.appendChild(tr);
-  });
-  // روابط الأحداث
-  Array.from(document.querySelectorAll('.action-btn.edit')).forEach(b => b.addEventListener('click', onEdit));
-  Array.from(document.querySelectorAll('.action-btn.del')).forEach(b => b.addEventListener('click', onDelete));
+function backHome() {
+    hideAll();
+    document.getElementById("home").classList.remove("hidden");
 }
 
-function escapeHtml(s){ return String(s||'').replace(/[&<>"]/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
-
-/* عرض نافذة إضافة */
-openAddBtn.addEventListener('click', () => {
-  editIndex = -1;
-  modalTitle.textContent = 'إضافة مستخدم';
-  modalErr.style.display = 'none';
-  m_name.value=''; m_pass.value=''; m_days.value=''; m_count.value=''; m_master.value=''; m_grams.value='';
-  overlay.style.display = 'flex';
-});
-
-/* إلغاء */
-cancelBtn.addEventListener('click', () => { overlay.style.display = 'none'; });
-
-/* حفظ (إضافة/تعديل) */
-saveBtn.addEventListener('click', () => {
-  modalErr.style.display = 'none';
-  const name = (m_name.value || '').trim();
-  const pass = (m_pass.value || '').trim();
-  const days = parseInt(m_days.value) || 0;
-  const count = parseInt(m_count.value) || 0;
-  const master = (m_master.value || '').trim();
-  const grams = parseInt(m_grams.value) || 0;
-
-  if(!name || !pass){ modalErr.textContent = 'الرجاء تعبئة الاسم وكلمة المرور.'; modalErr.style.display='block'; return; }
-
-  users = users || [];
-  if(editIndex === -1){
-    // تحقق عدم تكرار اسم المستخدم
-    if(users.some(x=>x.name === name)){ modalErr.textContent = 'اسم المستخدم موجود بالفعل.'; modalErr.style.display='block'; return; }
-    const obj = { name, pass, days, count, master, grams, role: (name === ADMIN_NAME ? 'admin' : 'user') };
-    users.push(obj);
-  } else {
-    const prevName = users[editIndex].name;
-    users[editIndex] = { ...users[editIndex], name, pass, days, count, master, grams, role: (name === ADMIN_NAME ? 'admin' : users[editIndex].role) };
-    // إذا كان المستخدم الذي عدّلناه هو نفس الجلسة الحالية — حدّث الجلسة
-    const sess = getSession();
-    if(sess && sess.name === prevName){
-      setSession(users[editIndex], localStorage.getItem(SESSION_KEY) ? true : false);
-      whoLabel.textContent = `${users[editIndex].name} — ${users[editIndex].role}`;
-    }
-  }
-
-  saveUsersToStorage();
-  renderTable(searchInput.value);
-  overlay.style.display = 'none';
-});
-
-/* تعديل */
-function onEdit(ev){
-  const i = Number(ev.currentTarget.dataset.i);
-  editIndex = i;
-  const u = users[i];
-  modalTitle.textContent = 'تعديل مستخدم';
-  m_name.value = u.name;
-  m_pass.value = u.pass;
-  m_days.value = u.days;
-  m_count.value = u.count;
-  m_master.value = u.master;
-  m_grams.value = u.grams;
-  modalErr.style.display = 'none';
-  overlay.style.display = 'flex';
+function hideAll() {
+    document.querySelectorAll(".card").forEach(e => e.classList.add("hidden"));
 }
 
-/* حذف */
-function onDelete(ev){
-  const i = Number(ev.currentTarget.dataset.i);
-  const u = users[i];
-  // منع حذف المشرف الأخير
-  if(u.role === 'admin'){
-    const admins = users.filter(x=>x.role==='admin');
-    if(admins.length === 1){
-      if(!confirm('هذا المستخدم مشرف وحيد. هل متأكد من حذفه؟')) return;
-    }
-  }
-  if(confirm('هل تريد حذف المستخدم؟')){
-    users.splice(i,1);
-    saveUsersToStorage();
-    renderTable(searchInput.value);
-  }
+/* ======= تسجيل دخول المشرف ======= */
+function loginAdmin() {
+    let user = adminUser.value.trim();
+    let pass = adminPass.value.trim();
+
+    let admins = JSON.parse(localStorage.getItem("admins"));
+
+    let ok = admins.find(a => a.user === user && a.pass === pass);
+
+    if (!ok) return alert("خطأ في البيانات!");
+
+    loadUsers();
+    hideAll();
+    document.getElementById("adminPanel").classList.remove("hidden");
 }
 
-/* بحث ومسح */
-searchInput.addEventListener('input', ()=> renderTable(searchInput.value));
-clearSearch.addEventListener('click', ()=> { searchInput.value=''; renderTable(); });
+/* ======= تسجيل دخول المستخدم ======= */
+function loginUser() {
+    let user = userName.value.trim();
+    let pass = userPass.value.trim();
 
-/* تسجيل خروج */
-document.getElementById('logoutBtn').addEventListener('click', ()=>{
-  clearSession();
-  showLogin();
-});
+    let users = JSON.parse(localStorage.getItem("users"));
 
-/* دالة مساعدة للعرض الأولي */
-function renderTableInitial(){ users = ensureDefaults(); renderTable(); }
-renderTableInitial();
+    let ok = users.find(a => a.user === user && a.pass === pass);
+
+    if (!ok) return alert("خطأ في البيانات!");
+
+    document.getElementById("userInfo").innerHTML = 
+        `<p>الاسم: ${ok.name}</p>
+         <p>اسم المستخدم: ${ok.user}</p>`;
+
+    hideAll();
+    document.getElementById("userPage").classList.remove("hidden");
+}
+
+/* ======= إضافة مستخدم ======= */
+function addUserFunc() {
+    let name = addName.value.trim();
+    let user = addUser.value.trim();
+    let pass = addPass.value.trim();
+
+    if (!name || !user || !pass) return alert("أدخل كل البيانات");
+
+    let users = JSON.parse(localStorage.getItem("users"));
+    users.push({name, user, pass});
+    localStorage.setItem("users", JSON.stringify(users));
+
+    addName.value = "";
+    addUser.value = "";
+    addPass.value = "";
+
+    loadUsers();
+}
+
+/* ======= عرض قائمة المستخدمين ======= */
+function loadUsers() {
+    let users = JSON.parse(localStorage.getItem("users"));
+    let out = "";
+
+    users.forEach((u, i) => {
+        out += `
+        <div class="list-item">
+            <p>الاسم: ${u.name}</p>
+            <p>يوزر: ${u.user}</p>
+            <button onclick="deleteUser(${i})">حذف</button>
+        </div>`;
+    });
+
+    document.getElementById("usersList").innerHTML = out;
+}
+
+/* ======= حذف مستخدم ======= */
+function deleteUser(i) {
+    let users = JSON.parse(localStorage.getItem("users"));
+    users.splice(i, 1);
+    localStorage.setItem("users", JSON.stringify(users));
+    loadUsers();
+}
+
+/* ======= تسجيل الخروج ======= */
+function logout() {
+    backHome();
+}
 </script>
+
 </body>
 </html>
